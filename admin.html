@@ -9,70 +9,152 @@
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
+        
+        <div class="flex justify-center mb-6">
+            <img src="logo.png" alt="Academy Logo" class="h-20 object-contain" onerror="this.style.display='none'">
+        </div>
+
         <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Student</h2>
         
         <form id="addForm" class="space-y-4">
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Name</label>
+                <label class="block text-gray-700 font-medium mb-1">Name <span class="text-red-500">*</span></label>
                 <input type="text" id="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Registration No</label>
+                <label class="block text-gray-700 font-medium mb-1">Registration No <span class="text-red-500">*</span></label>
                 <input type="text" id="registration_no" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Date of Registration</label>
+                <label class="block text-gray-700 font-medium mb-1">Date of Registration <span class="text-red-500">*</span></label>
                 <input type="date" id="date" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             
-            <div>
-                <label class="block text-gray-700 font-medium mb-1">Kyu</label>
-                <input type="text" id="kyu" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Kyu</label>
+                    <input type="text" id="kyu" placeholder="e.g. 10th" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Colour Belt</label>
+                    <select id="belt" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <option value="">-- Select Belt --</option>
+                        <option value="White">White</option>
+                        <option value="Yellow">Yellow</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Green">Green</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Purple">Purple</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Black">Black</option>
+                    </select>
+                </div>
             </div>
+            <p id="beltError" class="text-red-500 text-sm hidden">Please enter either Kyu or select a Colour Belt.</p>
             
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Colour Belt</label>
-                <input type="text" id="belt" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-gray-700 font-medium mb-1">State <span class="text-red-500">*</span></label>
+                <select id="state" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    <option value="">-- Select State --</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra & Nagar Haveli and Daman & Diu</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                    <option value="Ladakh">Ladakh</option>
+                    <option value="Lakshadweep">Lakshadweep</option>
+                    <option value="Puducherry">Puducherry</option>
+                </select>
             </div>
             
-            <div>
-                <label class="block text-gray-700 font-medium mb-1">State</label>
-                <input type="text" id="state" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 mt-4">
+            <button id="submitBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
                 Save Student
             </button>
         </form>
     </div>
 
     <script>
-        const API_URL = "https://karate-api.karateamitshaw.workers.dev/add"; // Replace with your Worker URL
+        const API_URL = "YOUR_WORKER_URL_HERE/add"; // Replace with your Worker URL
 
         document.getElementById('addForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const kyuInput = document.getElementById('kyu').value.trim();
+            const beltInput = document.getElementById('belt').value;
+            const errorText = document.getElementById('beltError');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Custom Validation: Kyu OR Belt must be present
+            if (!kyuInput && !beltInput) {
+                errorText.classList.remove('hidden');
+                return;
+            } else {
+                errorText.classList.add('hidden');
+            }
+
+            // Disable button & show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Saving Data...";
+
             const data = {
-                name: document.getElementById('name').value,
-                registration_no: document.getElementById('registration_no').value,
+                name: document.getElementById('name').value.trim(),
+                registration_no: document.getElementById('registration_no').value.trim(),
                 date_of_registration: document.getElementById('date').value,
-                kyu: document.getElementById('kyu').value,
-                colour_belt: document.getElementById('belt').value,
+                kyu: kyuInput,
+                colour_belt: beltInput,
                 state: document.getElementById('state').value
             };
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-            if(response.ok) {
-                alert("Saved successfully!");
-                document.getElementById('addForm').reset();
-            } else {
-                alert("Error saving data.");
+                if(response.ok) {
+                    alert("Saved successfully!");
+                    document.getElementById('addForm').reset();
+                } else {
+                    alert("Error saving data. Please check your network or Worker.");
+                }
+            } catch (error) {
+                alert("An error occurred: " + error.message);
+            } finally {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Save Student";
             }
         });
     </script>
