@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Students</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8">
 
@@ -18,6 +19,8 @@
             Admin Login
         </a>
     </div>
+
+    <div class="max-w-6xl mx-auto space-y-8">
         
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Search Students</h2>
@@ -36,14 +39,10 @@
                         <label class="block text-gray-600 text-sm font-medium mb-1">Colour Belt</label>
                         <select id="belt" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                             <option value="">Any</option>
-                            <option value="White">White</option>
-                            <option value="Yellow">Yellow</option>
-                            <option value="Orange">Orange</option>
-                            <option value="Green">Green</option>
-                            <option value="Blue">Blue</option>
-                            <option value="Purple">Purple</option>
-                            <option value="Brown">Brown</option>
-                            <option value="Black">Black</option>
+                            <option value="White">White</option><option value="Yellow">Yellow</option>
+                            <option value="Orange">Orange</option><option value="Green">Green</option>
+                            <option value="Blue">Blue</option><option value="Purple">Purple</option>
+                            <option value="Brown">Brown</option><option value="Black">Black</option>
                         </select>
                     </div>
                     <div>
@@ -94,7 +93,7 @@
                     </div>
                     <div>
                         <label class="block text-gray-600 text-sm font-medium mb-1">Year of Reg (YYYY)</label>
-                        <input type="number" id="year" placeholder="2024" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="number" id="year" placeholder="e.g. 2024" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
                 
@@ -107,21 +106,33 @@
         </div>
 
         <div id="resultsContainer" class="bg-white rounded-lg shadow-md overflow-hidden hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-left border-collapse">
-                    <thead class="bg-gray-50 border-b">
+            
+            <div id="printableTable" class="overflow-x-auto p-4">
+                <h2 id="pdfHeader" class="text-xl font-bold mb-4 hidden">Student Search Results</h2>
+                <table class="min-w-full text-left border-collapse border border-gray-200">
+                    <thead class="bg-gray-100 border-b">
                         <tr>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-700">Name</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-700">Reg No</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-700">Date</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-700">Kyu</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-700">Belt</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-700">State</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-700 border">Name</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-700 border">Reg No</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-700 border">Date</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-700 border">Kyu</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-700 border">Belt</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-700 border">State</th>
                         </tr>
                     </thead>
                     <tbody id="resultsBody" class="divide-y divide-gray-200"></tbody>
                 </table>
             </div>
+
+            <div id="downloadActions" class="p-4 bg-gray-50 border-t flex justify-end space-x-4 hidden">
+                <button id="btnDownloadHtml" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Download HTML
+                </button>
+                <button id="btnDownloadPdf" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Download PDF
+                </button>
+            </div>
+
             <div id="noResults" class="p-6 text-center text-gray-500 hidden">
                 No students found matching your criteria.
             </div>
@@ -129,7 +140,7 @@
     </div>
 
     <script>
-        const API_URL = "https://karate-api.karateamitshaw.workers.dev/search"; // Replace with your Worker URL
+        const API_URL = "https://karate-api.karateamitshaw.workers.dev"; // REPLACE WITH YOUR WORKER URL (no /search at the end)
 
         document.getElementById('searchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -147,33 +158,40 @@
             });
 
             try {
-                const response = await fetch(`${API_URL}?${params.toString()}`);
+                const response = await fetch(`${API_URL}/search?${params.toString()}`);
                 const data = await response.json();
                 
                 const container = document.getElementById('resultsContainer');
                 const tbody = document.getElementById('resultsBody');
                 const noResults = document.getElementById('noResults');
+                const downloadActions = document.getElementById('downloadActions');
+                const printableTable = document.getElementById('printableTable');
                 
                 container.classList.remove('hidden');
                 tbody.innerHTML = ""; 
 
                 if (data.length === 0) {
                     noResults.classList.remove('hidden');
+                    downloadActions.classList.add('hidden');
+                    printableTable.classList.add('hidden');
                 } else {
                     noResults.classList.add('hidden');
+                    printableTable.classList.remove('hidden');
+                    downloadActions.classList.remove('hidden'); // Show download buttons
+
                     data.forEach(student => {
                         tbody.innerHTML += `
                             <tr class="hover:bg-gray-50 transition duration-150">
-                                <td class="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">${student.name}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${student.registration_no}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${student.date_of_registration}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${student.kyu || '-'}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
+                                <td class="px-6 py-4 text-sm text-gray-800 whitespace-nowrap border">${student.name}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap border">${student.registration_no}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap border">${student.date_of_registration}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap border">${student.kyu || '-'}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap border">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-300">
                                         ${student.colour_belt || '-'}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${student.state}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap border">${student.state}</td>
                             </tr>
                         `;
                     });
@@ -184,6 +202,60 @@
                 searchBtn.disabled = false;
                 searchBtn.innerText = "Search";
             }
+        });
+
+        // --- DOWNLOAD AS HTML LOGIC ---
+        document.getElementById('btnDownloadHtml').addEventListener('click', () => {
+            const tableHtml = document.querySelector('#printableTable').innerHTML;
+            const fullHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Student Search Results</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h2 { text-align: center; color: #333; }
+                        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        th { background-color: #f4f4f4; color: #333; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                    </style>
+                </head>
+                <body>
+                    ${tableHtml.replace('hidden', '')} </body>
+                </html>
+            `;
+            
+            const blob = new Blob([fullHtml], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Student_Search_Results.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // --- DOWNLOAD AS PDF LOGIC ---
+        document.getElementById('btnDownloadPdf').addEventListener('click', () => {
+            const element = document.getElementById('printableTable');
+            const header = document.getElementById('pdfHeader');
+            
+            // Show the header title temporarily for the PDF
+            header.classList.remove('hidden');
+
+            const opt = {
+                margin:       0.5,
+                filename:     'Student_Search_Results.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+
+            // Generate PDF
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Hide the header title again after PDF is generated
+                header.classList.add('hidden');
+            });
         });
     </script>
 </body>
