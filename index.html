@@ -235,26 +235,32 @@
             document.body.removeChild(a);
         });
 
-        // --- DOWNLOAD AS PDF LOGIC ---
+       // --- DOWNLOAD AS PDF LOGIC ---
         document.getElementById('btnDownloadPdf').addEventListener('click', () => {
             const element = document.getElementById('printableTable');
             const header = document.getElementById('pdfHeader');
             
-            // Show the header title temporarily for the PDF
+            // 1. Show the header title temporarily for the PDF
             header.classList.remove('hidden');
+            
+            // 2. FIX: Temporarily remove the horizontal scroll class. 
+            // html2pdf cannot render elements that have overflow-x-auto!
+            element.classList.remove('overflow-x-auto');
 
             const opt = {
                 margin:       0.5,
                 filename:     'Student_Search_Results.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                // 3. FIX: Force it to render from the top-left so scrolling down doesn't break it
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 }, 
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
             };
 
             // Generate PDF
             html2pdf().set(opt).from(element).save().then(() => {
-                // Hide the header title again after PDF is generated
+                // Restore the layout after the PDF finishes downloading
                 header.classList.add('hidden');
+                element.classList.add('overflow-x-auto');
             });
         });
     </script>
